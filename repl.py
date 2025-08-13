@@ -54,12 +54,39 @@ def list_playlists():
     )
     response = request.execute()
     playlists = response.get("items", [])
-    for pl in playlists:
-        title = pl["snippet"]["title"]
-        access = pl["status"]["privacyStatus"]
-        print(f"{title} ({access})")
     if not playlists:
         print("No playlists found.")
+        return
+    for idx, pl in enumerate(playlists, 1):
+        title = pl["snippet"]["title"]
+        access = pl["status"]["privacyStatus"]
+        print(f"{idx}. {title} ({access})")
+    while True:
+        sel = input("Select a playlist number to view videos, or press Enter to return: ").strip()
+        if sel == '':
+            break
+        if not sel.isdigit() or not (1 <= int(sel) <= len(playlists)):
+            print("Invalid selection. Try again.")
+            continue
+        playlist_id = playlists[int(sel)-1]["id"]
+        show_playlist_videos(youtube, playlist_id)
+        break
+
+def show_playlist_videos(youtube, playlist_id):
+    request = youtube.playlistItems().list(
+        part="snippet",
+        playlistId=playlist_id,
+        maxResults=50
+    )
+    response = request.execute()
+    items = response.get("items", [])
+    if not items:
+        print("No videos found in this playlist.")
+        return
+    print("Videos:")
+    for idx, item in enumerate(items, 1):
+        title = item["snippet"]["title"]
+        print(f"  {idx}. {title}")
 
 # Print authentication status on startup
 if is_authenticated():
