@@ -1,8 +1,8 @@
 import os
-import sys
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
+import time
 
 SCOPES = ["https://www.googleapis.com/auth/youtube"]
 TOKEN_FILE = "token.json"
@@ -94,7 +94,8 @@ def show_playlist_videos(youtube, playlist_id):
     print("Videos:")
     for idx, item in enumerate(all_items, 1):
         title = item["snippet"]["title"]
-        print(f"  {idx}. {title}")
+        added_by = item["snippet"].get("videoOwnerChannelTitle", "Unknown")
+        print(f"  {idx}. {title} (added by: {added_by})")
     while True:
         swap_input = input("Enter two comma separated numbers to swap videos, or press Enter to return: ").strip()
         if swap_input == '':
@@ -138,6 +139,7 @@ def show_playlist_videos(youtube, playlist_id):
                 }
             ).execute()
             print(f"Swapped video {first} and {second}.")
+            time.sleep(1)
             # Refresh list
             all_items = []
             next_page_token = None
@@ -156,7 +158,8 @@ def show_playlist_videos(youtube, playlist_id):
                     break
             for idx, item in enumerate(all_items, 1):
                 title = item["snippet"]["title"]
-                print(f"  {idx}. {title}")
+                added_by = item["snippet"].get("videoOwnerChannelTitle", "Unknown")
+                print(f"  {idx}. {title} (added by: {added_by})")
         except Exception as e:
             print(f"Error: {e}. Try again.")
 
