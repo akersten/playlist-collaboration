@@ -76,7 +76,7 @@ def show_playlist_videos(youtube, playlist_id):
     request = youtube.playlistItems().list(
         part="snippet",
         playlistId=playlist_id,
-        maxResults=50
+        maxResults=300
     )
     response = request.execute()
     items = response.get("items", [])
